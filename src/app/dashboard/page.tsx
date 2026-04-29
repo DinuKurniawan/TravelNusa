@@ -57,7 +57,7 @@ export default async function DashboardPage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <Badge variant="secondary">{booking.status}</Badge>
+                        <Badge variant="secondary">{booking.booking_status}</Badge>
                         <span className="font-semibold text-primary">{formatCurrency(booking.total_price)}</span>
                       </div>
                     </div>
@@ -69,7 +69,7 @@ export default async function DashboardPage() {
                 </div>
               )}
               <Button className="w-fit" variant="outline" asChild>
-                <Link href="/dashboard/booking">
+                <Link href="/dashboard/bookings">
                   <CalendarCheck data-icon="inline-start" />
                   Lihat Semua Booking
                 </Link>

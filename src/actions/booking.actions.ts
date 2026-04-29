@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 import { bookingSchema } from "@/lib/validations/booking";
@@ -19,11 +19,11 @@ export async function createBookingAction(_: ActionState, formData: FormData): P
     return successState("Mode demo: booking tervalidasi. Hubungkan Supabase agar data tersimpan.");
   }
 
+  const session = await requireUser();
   const supabase = await createClient();
-  const session = await getCurrentUser();
   const { data: selectedPackage, error: packageError } = await supabase
     .from("travel_packages")
-    .select("price,discount_price,status")
+    .select("id,name,slug,price,discount_price,quota,status")
     .eq("id", parsed.data.package_id)
     .single();
 
@@ -31,10 +31,14 @@ export async function createBookingAction(_: ActionState, formData: FormData): P
     return errorState("Paket travel tidak tersedia.");
   }
 
+  if (parsed.data.participant_count > selectedPackage.quota) {
+    return errorState(`Jumlah peserta tidak boleh melebihi kuota ${selectedPackage.quota}.`);
+  }
+
   const pricePerPerson = Number(selectedPackage.discount_price ?? selectedPackage.price);
   const totalPrice = calculateTotalBooking(parsed.data.participant_count, pricePerPerson);
-  const { error } = await supabase.from("bookings").insert({
-    user_id: session?.user.id ?? null,
+  const { data: booking, error } = await supabase.from("bookings").insert({
+    user_id: session.user.id,
     package_id: parsed.data.package_id,
     full_name: parsed.data.full_name,
     email: parsed.data.email,
@@ -44,14 +48,19 @@ export async function createBookingAction(_: ActionState, formData: FormData): P
     price_per_person: pricePerPerson,
     total_price: totalPrice,
     note: parsed.data.note ?? null,
-    status: "pending",
-  });
+    booking_status: "pending_payment",
+  }).select("id,booking_code").single();
 
   if (error) return errorState(error.message);
 
   revalidatePath("/dashboard");
-  revalidatePath("/admin/booking");
-  return successState("Booking berhasil dikirim. Tim kami akan menghubungi Anda.");
+  revalidatePath("/dashboard/bookings");
+  revalidatePath("/admin/bookings");
+  return successState("Booking berhasil dibuat. Lanjutkan pembayaran.", {
+    bookingId: booking.id,
+    bookingCode: booking.booking_code,
+    redirectTo: `/payment/${booking.booking_code}`,
+  });
 }
 
 export async function createContactMessageAction(_: ActionState, formData: FormData): Promise<ActionState> {

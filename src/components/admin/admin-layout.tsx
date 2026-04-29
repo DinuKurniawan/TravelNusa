@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   BookOpen,
   CalendarCheck,
+  CreditCard,
   Gauge,
   Images,
   LayoutDashboard,
@@ -24,7 +25,8 @@ const navItems = [
   [Map, "Destinasi", "/admin/destinasi"],
   [Tags, "Kategori", "/admin/kategori"],
   [PackageOpen, "Paket", "/admin/paket"],
-  [CalendarCheck, "Booking", "/admin/booking"],
+  [CalendarCheck, "Booking", "/admin/bookings"],
+  [CreditCard, "Pembayaran", "/admin/payments"],
   [Images, "Galeri", "/admin/galeri"],
   [BookOpen, "Blog", "/admin/blog"],
   [MessageSquareQuote, "Testimoni", "/admin/testimoni"],

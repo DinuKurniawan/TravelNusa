@@ -109,8 +109,64 @@ export type Database = {
           total_price: number;
           note: string | null;
           admin_note: string | null;
-          status: "pending" | "confirmed" | "paid" | "completed" | "cancelled";
+          booking_status:
+            | "pending_payment"
+            | "paid"
+            | "confirmed"
+            | "completed"
+            | "cancelled"
+            | "expired";
         } & Timestamped
+      >;
+      payments: TableDef<
+        {
+          id: string;
+          booking_id: string;
+          order_id: string;
+          snap_token: string | null;
+          snap_redirect_url: string | null;
+          payment_type: string | null;
+          transaction_id: string | null;
+          transaction_status: string;
+          fraud_status: string | null;
+          gross_amount: number;
+          currency: string;
+          payment_status:
+            | "pending"
+            | "settlement"
+            | "capture"
+            | "expire"
+            | "cancel"
+            | "deny"
+            | "failure"
+            | "refund";
+          raw_response: Json | null;
+          paid_at: string | null;
+          expired_at: string | null;
+        } & Timestamped
+      >;
+      tickets: TableDef<
+        {
+          id: string;
+          booking_id: string;
+          ticket_code: string;
+          qr_code_url: string | null;
+          pdf_url: string | null;
+          ticket_status: "active" | "used" | "cancelled";
+          issued_at: string;
+          used_at: string | null;
+        } & Timestamped
+      >;
+      payment_logs: TableDef<
+        {
+          id: string;
+          payment_id: string;
+          order_id: string | null;
+          event_type: string | null;
+          transaction_status: string | null;
+          payload: Json | null;
+          created_at: string;
+        }
       >;
       testimonials: TableDef<
         {
@@ -179,6 +235,7 @@ export type Database = {
     Functions: {
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       generate_booking_code: { Args: Record<PropertyKey, never>; Returns: string };
+      generate_ticket_code: { Args: Record<PropertyKey, never>; Returns: string };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

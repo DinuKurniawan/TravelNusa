@@ -44,10 +44,13 @@ export async function getAdminItineraries(packageId: string) {
 export async function getAdminBookings(status?: string) {
   await requireAdmin();
   const supabase = await createClient();
-  let query = supabase.from("bookings").select("*, travel_packages(name, slug, main_image_url)").order("created_at", { ascending: false });
-  const statuses = ["pending", "confirmed", "paid", "completed", "cancelled"] as const;
+  let query = supabase
+    .from("bookings")
+    .select("*, travel_packages(name, slug, main_image_url), payments(*), tickets(*)")
+    .order("created_at", { ascending: false });
+  const statuses = ["pending_payment", "confirmed", "paid", "completed", "cancelled", "expired"] as const;
   if (status && statuses.includes(status as (typeof statuses)[number])) {
-    query = query.eq("status", status as (typeof statuses)[number]);
+    query = query.eq("booking_status", status as (typeof statuses)[number]);
   }
   const { data } = await query;
   return (data ?? []) as unknown as Booking[];

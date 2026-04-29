@@ -1,20 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CheckCircle2, Clock, MessageCircle, Star, Users, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, CreditCard, MessageCircle, ShieldCheck, Star, Users, XCircle } from "lucide-react";
 
-import { BookingForm } from "@/components/forms/booking-form";
 import { PublicShell } from "@/components/public/public-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getPackageBySlug, getPackageItineraries, getPackages } from "@/lib/data/public";
+import { getPackageBySlug, getPackageItineraries } from "@/lib/data/public";
 import { formatCurrency } from "@/lib/utils";
 
 export default async function PackageDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const item = await getPackageBySlug(slug);
   if (!item) notFound();
-  const [itineraries, packages] = await Promise.all([getPackageItineraries(item.id), getPackages()]);
+  const itineraries = await getPackageItineraries(item.id);
   const price = item.discount_price ?? item.price;
 
   return (
@@ -91,11 +90,34 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
             </div>
           </article>
           <aside className="flex h-fit flex-col gap-4">
-            <BookingForm packages={packages} defaultPackageId={item.id} />
+            <div className="soft-card flex flex-col gap-5 p-5 md:p-6">
+              <div>
+                <p className="text-sm text-muted-foreground">Mulai dari</p>
+                <p className="mt-1 text-3xl font-semibold text-primary">{formatCurrency(price)}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Total akan dihitung otomatis berdasarkan jumlah peserta.
+                </p>
+              </div>
+              <div className="rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
+                <p className="flex items-center gap-2 font-medium text-foreground">
+                  <ShieldCheck data-icon="inline-start" />
+                  Pembayaran aman via Midtrans
+                </p>
+                <p className="mt-2 leading-6">
+                  Booking disimpan sebagai pending payment sebelum Snap dibuka. Tiket diterbitkan otomatis setelah pembayaran berhasil.
+                </p>
+              </div>
+              <Button size="lg" asChild>
+                <Link href={`/booking/${item.slug}`}>
+                  <CreditCard data-icon="inline-start" />
+                  Booking Sekarang
+                </Link>
+              </Button>
+            </div>
             <Button variant="outline" asChild>
               <Link href="https://wa.me/6281234567890" target="_blank">
                 <MessageCircle data-icon="inline-start" />
-                WhatsApp Admin
+                Tanya via WhatsApp
               </Link>
             </Button>
           </aside>

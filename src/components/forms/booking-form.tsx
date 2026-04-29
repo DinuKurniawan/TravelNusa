@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/incompatible-library */
 
 import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarDays, Send } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -26,6 +27,7 @@ export function BookingForm({
   packages: TravelPackage[];
   defaultPackageId?: string;
 }) {
+  const router = useRouter();
   const [serverMessage, setServerMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   type BookingFormInput = z.input<typeof bookingSchema>;
@@ -60,7 +62,8 @@ export function BookingForm({
       setServerMessage(result.message);
       if (result.ok) {
         toast.success(result.message);
-        form.reset({ ...values, note: "", participant_count: 1 });
+        const redirectTo = typeof result.data?.redirectTo === "string" ? result.data.redirectTo : "/dashboard/bookings";
+        router.push(redirectTo);
       } else {
         toast.error(result.message);
       }

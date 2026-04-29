@@ -19,8 +19,8 @@ export default async function AdminDashboardPage() {
     getAdminProfiles(),
   ]);
 
-  const pending = bookings.filter((item) => item.status === "pending").length;
-  const confirmed = bookings.filter((item) => item.status === "confirmed").length;
+  const pending = bookings.filter((item) => item.booking_status === "pending_payment").length;
+  const confirmed = bookings.filter((item) => item.booking_status === "confirmed").length;
   const monthly = Array.from({ length: 6 }).map((_, index) => {
     const date = new Date();
     date.setMonth(date.getMonth() - (5 - index));
@@ -103,7 +103,7 @@ export default async function AdminDashboardPage() {
                 <p className="text-sm text-muted-foreground">{booking.booking_code} • {formatDate(booking.created_at)}</p>
               </div>
               <div className="flex items-center gap-3">
-                <Badge variant="secondary">{booking.status}</Badge>
+                <Badge variant="secondary">{booking.booking_status}</Badge>
                 <span className="font-semibold text-primary">{formatCurrency(booking.total_price)}</span>
               </div>
             </div>

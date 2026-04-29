@@ -218,17 +218,19 @@ export async function saveTestimonialAction(formData: FormData) {
 export async function updateBookingStatusAction(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") ?? "");
-  const status = String(formData.get("status") ?? "pending") as BookingStatus;
+  const status = String(formData.get("status") ?? "pending_payment") as BookingStatus;
   const adminNote = nullableString(formData.get("admin_note"));
 
   const supabase = getSupabaseAdmin();
   const { error } = await supabase
     .from("bookings")
-    .update({ status, admin_note: adminNote })
+    .update({ booking_status: status, admin_note: adminNote })
     .eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin/booking");
+  revalidatePath("/admin/bookings");
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/bookings");
 }
 
 export async function updateUserAction(formData: FormData) {

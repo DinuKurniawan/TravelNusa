@@ -4,6 +4,7 @@ export type ActionState = {
   ok: boolean;
   message: string;
   errors?: Record<string, string[] | undefined>;
+  data?: Record<string, unknown>;
 };
 
 export const initialActionState: ActionState = {
@@ -26,9 +27,10 @@ export function errorState(message: string): ActionState {
   };
 }
 
-export function successState(message: string): ActionState {
+export function successState(message: string, data?: Record<string, unknown>): ActionState {
   return {
     ok: true,
     message,
+    data,
   };
 }
