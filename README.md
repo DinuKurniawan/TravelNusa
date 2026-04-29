@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TravelNusa Indonesia
 
-## Getting Started
+Website travel Indonesia berbasis Next.js App Router untuk destinasi, paket perjalanan, galeri, artikel, testimoni, booking customer, dan dashboard admin.
 
-First, run the development server:
+## Tech Stack
+
+- Next.js App Router, TypeScript, Tailwind CSS
+- Supabase Database, Auth, Storage, SSR Client
+- shadcn/ui, Lucide React, Sonner toast
+- React Hook Form, Zod
+- TanStack Table untuk tabel admin
+- Recharts untuk statistik dashboard
+
+## Install
+
+```bash
+npm install
+```
+
+## Setup Supabase
+
+1. Buat project Supabase.
+2. Buka SQL Editor dan jalankan berurutan:
+   - `supabase/schema.sql`
+   - `supabase/functions.sql`
+   - `supabase/policies.sql`
+   - opsional `supabase/seed.sql`
+3. Storage bucket dibuat otomatis oleh `supabase/policies.sql` dan `npm run seed`.
+
+## Environment Variables
+
+Salin `.env.example` menjadi `.env.local`.
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+ADMIN_EMAIL=admin@travelnusa.test
+ADMIN_PASSWORD=AdminTravel#2026
+```
+
+`NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_ANON_KEY` boleh dipakai client. `SUPABASE_SERVICE_ROLE_KEY` hanya untuk server/script dan tidak boleh diekspos ke browser. Jangan commit `.env.local`.
+
+## Seeder
+
+Seeder TypeScript membuat admin default, bucket storage, settings, kategori, destinasi, paket, itinerary, testimoni, blog, dan galeri.
+
+```bash
+npm run seed
+```
+
+Akun admin default:
+
+- Email: `admin@travelnusa.test`
+- Password: `AdminTravel#2026`
+
+Ganti password admin setelah deployment production.
+
+## Menjalankan Project
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Validasi build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
 
-## Learn More
+## Struktur Folder
 
-To learn more about Next.js, take a look at the following resources:
+```text
+src/
+  app/                  Route publik, dashboard customer, admin
+  actions/              Server actions auth, booking, admin CRUD
+  components/
+    admin/              Layout, tabel, chart, form admin
+    forms/              Booking, contact, auth, profile forms
+    public/             Header, footer, cards, galeri
+    shared/             Provider dan logo
+    ui/                 shadcn/ui components
+  lib/
+    data/               Data fetcher publik/admin + fallback demo
+    supabase/           Client browser, server, admin
+    validations/        Zod schemas
+  types/                Domain dan database types
+supabase/               Schema, functions, policies, seed SQL
+scripts/seed.ts         Seeder default via service role
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Catatan Deployment Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Set semua environment variables di Vercel Project Settings. Pastikan `SUPABASE_SERVICE_ROLE_KEY` hanya tersedia sebagai server-side env. Jalankan SQL di Supabase sebelum deploy, lalu jalankan seeder dari mesin lokal atau CI yang aman. Public pages memiliki fallback demo data ketika Supabase belum dikonfigurasi, tetapi booking, auth, dan admin membutuhkan env Supabase valid.
