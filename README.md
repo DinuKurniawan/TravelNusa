@@ -90,6 +90,9 @@ Akun admin default:
 - Email: `admin@travelnusa.test`
 - Password: `AdminTravel#2026`
 
+Jika `ADMIN_EMAIL` atau `ADMIN_PASSWORD` di environment diubah, jalankan ulang `npm run seed`.
+Seeder akan menyamakan password akun admin yang sudah ada dengan nilai `ADMIN_PASSWORD`.
+
 Ganti password admin setelah deployment production.
 
 ## Menjalankan Project

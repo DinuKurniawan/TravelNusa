@@ -1,6 +1,8 @@
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 
+import { ensureAdminUser } from "./seed-admin";
+
 config({ path: ".env.local" });
 config();
 
@@ -131,28 +133,11 @@ async function createBuckets() {
 }
 
 async function createAdminUser() {
-  const created = await supabase.auth.admin.createUser({
-    email: adminEmail,
-    password: adminPassword,
-    email_confirm: true,
-    user_metadata: {
-      full_name: "Admin TravelNusa",
-      role: "admin",
-    },
-  });
-
-  let user = created.data.user;
-  if (created.error) {
-    const listed = await supabase.auth.admin.listUsers();
-    user = listed.data.users.find((item) => item.email === adminEmail) ?? null;
-    if (!user) throw created.error;
-  }
-
-  await upsertOrThrow("profiles", {
-    id: user!.id,
-    full_name: "Admin TravelNusa",
-    role: "admin",
-    status: "active",
+  await ensureAdminUser({
+    supabase,
+    adminEmail,
+    adminPassword,
+    upsertProfile: (profile) => upsertOrThrow("profiles", profile),
   });
 }
 
