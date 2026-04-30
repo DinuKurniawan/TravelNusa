@@ -112,12 +112,21 @@ async function upsertOrThrow(
 }
 
 async function createBuckets() {
-  for (const bucket of ["destinations", "packages", "gallery", "blog", "avatars"]) {
-    const { error } = await supabase.storage.createBucket(bucket, { public: true });
+  const buckets = [
+    { name: "destinations", public: true },
+    { name: "packages", public: true },
+    { name: "gallery", public: true },
+    { name: "blog", public: true },
+    { name: "avatars", public: true },
+    { name: "tickets", public: false },
+  ];
+
+  for (const bucket of buckets) {
+    const { error } = await supabase.storage.createBucket(bucket.name, { public: bucket.public });
     if (error && !error.message.toLowerCase().includes("already exists")) {
       throw error;
     }
-    await supabase.storage.updateBucket(bucket, { public: true });
+    await supabase.storage.updateBucket(bucket.name, { public: bucket.public });
   }
 }
 

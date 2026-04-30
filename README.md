@@ -104,7 +104,7 @@ Validasi build:
 
 ```bash
 npm run lint
-npm run typecheck
+npm run type-check
 npm run build
 ```
 
@@ -130,5 +130,7 @@ scripts/seed.ts         Seeder default via service role
 ```
 
 ## Catatan Deployment Vercel
+
+Panduan production lengkap tersedia di [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 Set semua environment variables di Vercel Project Settings. Pastikan `SUPABASE_SERVICE_ROLE_KEY` hanya tersedia sebagai server-side env. Jalankan SQL di Supabase sebelum deploy, lalu jalankan seeder dari mesin lokal atau CI yang aman. Public pages memiliki fallback demo data ketika Supabase belum dikonfigurasi, tetapi booking, auth, dan admin membutuhkan env Supabase valid.
